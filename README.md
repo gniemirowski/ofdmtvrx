@@ -99,7 +99,7 @@ Window with last received image is *not* created – it's a TODO.
   * Better .wav file handling (with LIST chunks), maybe delegated to `sox` or some library
 * Output file handling
   * Create output directory if it doesn't exist
-  * Add option to save corrupted files
+  * Don't save files if output directory is not specified
   * Better duplicate file cache handling
   * Determine file type / extension (now .jpg is assumed, might be incorrect)
 * X11 integration
