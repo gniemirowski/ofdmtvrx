@@ -1,13 +1,15 @@
 #include <cstring>
+#include <cerrno>
 #include "crsdecoder.h"
 #include "throw.h"
 #include "decoder_constants.h"
 #include "file.h"
 #include "log.h"
+#include "platform.h"
 
 void CRSDecoder::usePayload(const std::vector<uint8_t> &payload)
 {
-	xassert(payload.size() == decoder_constants::data_bits / 8, "Invalid payload size (%zu bytes)", payload.size());
+	xassert(payload.size() == decoder_constants::data_bits / 8, "Invalid payload size (" SIZET_FMT " bytes)", payload.size());
 	if(memcmp(&payload[0], "CRS", 3)) {
 		logn("Invalid payload (not CRS)");
 		return;
@@ -51,7 +53,7 @@ void CRSDecoder::usePayload(const std::vector<uint8_t> &payload)
 	}
 
 	m_data.resize(imageBytes);
-	if(m_crsec.recover(&m_data[0], m_data.size(), m_identList.size()) != imageCRC32) {
+	if((uint32_t) m_crsec.recover(&m_data[0], m_data.size(), m_identList.size()) != imageCRC32) {
 		logv("Image corrupted");
 		m_data.clear();
 		m_currentsValid = false;
@@ -91,9 +93,9 @@ void CRSDecoder::save(const std::string &path)
 	xassert(!m_data.empty(), "save() called on empty data");
 
 	File f(fopen(path.c_str(), "wb"));
-	xassert(f, "Could not open file %s: %m", path.c_str());
+	xassert(f, "Could not open file %s: %s", path.c_str(), strerror(errno));
 	xassert(fwrite(&m_data[0], 1, m_data.size(), f) == m_data.size(), "Write error, disk full?");
-	xassert(fclose(f) == 0, "Could not close file %s: %m", path.c_str());
+	xassert(fclose(f) == 0, "Could not close file %s: %s", path.c_str(), strerror(errno));
 	f.release();
 
 	m_data.clear();

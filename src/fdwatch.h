@@ -1,5 +1,9 @@
 #pragma once
 
+#include "platform.h"
+
+#ifdef USE_FDWATCH
+
 #include <set>
 
 class FDWatch {
@@ -13,3 +17,5 @@ private:
 	std::set<int> m_outfds;
 	int m_numfds{0};
 };
+
+#endif

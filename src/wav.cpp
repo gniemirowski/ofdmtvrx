@@ -1,16 +1,17 @@
-#include <endian.h>
 #include <cstring>
+#include <cerrno>
 #include <fcntl.h>
 #include <unistd.h>
 #include "wav.h"
 #include "throw.h"
 #include "log.h"
+#include "platform.h"
 
 Wav::Wav(const std::string &file)
 {
 	if(!file.empty()) {
-		m_fd = open(file.c_str(), O_RDONLY | O_LARGEFILE);
-		xassert(m_fd >= 0, "Could not open %s: %m", file.c_str());
+		m_fd = open(file.c_str(), WAV_OPEN_FLAGS);
+		xassert(m_fd >= 0, "Could not open %s: %s", file.c_str(), strerror(errno));
 		m_close = true;
 	}
 
@@ -52,7 +53,7 @@ bool Wav::readHeader()
 	while(pos != sizeof(Hdr)) {
 		const ssize_t rs(read(m_fd, buf + pos, sizeof(Hdr) - pos));
 		if(rs < 0) {
-			loge("Error reading WAV header: %m");
+			loge("Error reading WAV header: %s", strerror(errno));
 			return false;
 		}
 
@@ -62,7 +63,7 @@ bool Wav::readHeader()
 		}
 
 		if((size_t) rs > (sizeof(Hdr) - pos)) {
-			loge("read() returned nonsense (%zd gt %zu)", rs, sizeof(Hdr) - pos);
+			loge("read() returned nonsense (" SSIZET_FMT " gt " SIZET_FMT ")", rs, sizeof(Hdr) - pos);
 			return false;
 		}
 
@@ -184,8 +185,8 @@ void Wav::readHandler()
 		return;
 	}
 
-	xassert(rs > 0, "Error reading WAV: %m");
-	xassert((size_t) rs <= sizeof(buf), "WAV read returned nonsense (%zd gt %zu)", rs, sizeof(buf));
+	xassert(rs > 0, "Error reading WAV: %s", strerror(errno));
+	xassert((size_t) rs <= sizeof(buf), "WAV read returned nonsense (" SSIZET_FMT " gt " SIZET_FMT ")", rs, sizeof(buf));
 
 	const size_t curSize(m_rawBuffer.size());
 	m_rawBuffer.resize(curSize + rs);

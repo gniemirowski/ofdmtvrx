@@ -1,3 +1,9 @@
+#include "platform.h"
+
+#ifdef USE_SIGFD
+
+/* %m is used all over the place, because this works only on POSIX anyway */
+
 #include <csignal>
 #include <sys/signalfd.h>
 #include <unistd.h>
@@ -5,6 +11,7 @@
 #include "throw.h"
 #include "log.h"
 #include "sigfd.h"
+#include "platform.h"
 
 SigFD::SigFD()
 {
@@ -41,6 +48,8 @@ int SigFD::readHandler()
 	const ssize_t rs(read(m_fd, &si, sizeof(si)));
 	xassert(rs != 0, "read(): EOF when reading from signalfd");
 	xassert(rs > 0, "read(): error reading from signalfd: %m");
-	xassert((size_t) rs == sizeof(si), "read(): size mismatch reading from signalfd: %zd ne %zu", rs, sizeof(si));
+	xassert((size_t) rs == sizeof(si), "read(): size mismatch reading from signalfd: " SSIZET_FMT " ne " SIZET_FMT, rs, sizeof(si));
 	return si.ssi_signo;
 }
+
+#endif

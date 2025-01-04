@@ -1,3 +1,9 @@
+#include "platform.h"
+
+#ifdef USE_FDWATCH
+
+/* %m is used, because this works only on POSIX anyway */
+
 #include <sys/select.h>
 #include "fdwatch.h"
 #include "log.h"
@@ -40,3 +46,5 @@ bool FDWatch::isReadable(int fd) const
 {
 	return m_outfds.find(fd) != m_outfds.end();
 }
+
+#endif

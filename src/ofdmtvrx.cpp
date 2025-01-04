@@ -20,6 +20,7 @@
 #include "xview.h"
 #include "fdwatch.h"
 #include "sigfd.h"
+#include "platform.h"
 
 static std::string getModeString(int mode)
 {
@@ -107,10 +108,12 @@ static void Main(int argc, char *const argv[])
 	// TODO print audio offset in seconds
 
 	AudioLevelPrinter alp;
+	std::unique_ptr<XView> xview;
+
+#ifdef USE_FDWATCH
 	FDWatch w;
 	w.add(wav.getFD());
 
-	std::unique_ptr<XView> xview;
 	if(version::withX() && !cli.getSuppressX()) {
 		xview.reset(new XView());
 		w.add(xview->getFD());
@@ -118,9 +121,11 @@ static void Main(int argc, char *const argv[])
 
 	SigFD sfd;
 	w.add(sfd.getFD());
+#endif
 
 	uint32_t offset(0);
 	for(;;) {
+#ifdef USE_FDWATCH
 		w.watch();
 
 		if(w.isReadable(sfd.getFD())) {
@@ -144,6 +149,7 @@ static void Main(int argc, char *const argv[])
 		}
 
 		if(w.isReadable(wav.getFD())) {
+#endif
 			wav.readHandler();
 			if(wav.isEOF()) {
 				break;
@@ -189,7 +195,7 @@ static void Main(int argc, char *const argv[])
 						if(crs.fileReady(crc32)) {
 							std::string prefix(outputDir);
 							if(!prefix.empty()) {
-								prefix += "/";
+								prefix += PATH_SEPARATOR;
 							}
 
 							const std::string fileName(util::format("%08X-%08X.%s", offset, crc32, crs.getExtension().c_str()));
@@ -218,6 +224,7 @@ static void Main(int argc, char *const argv[])
 
 				offset += audioBuffer.size();
 			}
+#ifdef USE_FDWATCH
 		}
 
 		/* Checking for readability before calling handler resulted in events not being
@@ -226,6 +233,7 @@ static void Main(int argc, char *const argv[])
 		if(xview) {
 			xview->readHandler();
 		}
+#endif
 	}
 }
 
