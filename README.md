@@ -27,7 +27,7 @@ This command should do the trick on Debian:
 ```
 sudo apt-get install g++ scons git libx11-dev && \
 git clone https://github.com/CircuitChaos/ofdmtvrx && \
-cd ofdmtvrx && scons WITH_X=1 && sudo scons install
+cd ofdmtvrx && scons WITH_X=1 && sudo scons install WITH_X=1
 ```
 
 Or, if you don't need X support:
@@ -35,7 +35,7 @@ Or, if you don't need X support:
 ```
 sudo apt-get install g++ scons git && \
 git clone https://github.com/CircuitChaos/ofdmtvrx && \
-cd ofdmtvrx && scons WITH_X=0 && sudo scons install
+cd ofdmtvrx && scons WITH_X=0 && sudo scons install WITH_X=0
 ```
 
 There may be some other dependencies. If you happen to stumble upon them, please let me know.
@@ -68,7 +68,7 @@ Finally, you can go to command line (Windows+R, cmd, Enter) and type these comma
 cd c:\ofdm
 set PATH=%PATH%;c:\ofdm\git\bin;c:\ofdm\mingw64\bin;c:\ofdm\scons
 git clone https://github.com/CircuitChaos/ofdmtvrx
-cd ofdmtvtx
+cd ofdmtvrx
 scons
 ```
 

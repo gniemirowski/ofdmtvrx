@@ -39,5 +39,7 @@ else:
 env.VariantDir('build', 'src', duplicate = 0)
 env.AlwaysBuild(['build/version.o', 'build/ofdmtvrx'])
 ofdmtvrx = env.Program('build/ofdmtvrx', Glob('build/*.cpp'))
-env.Install('/usr/local/bin', ofdmtvrx)
-env.Alias('install', '/usr/local/bin')
+
+if plat == 'posix':
+    env.Install('/usr/local/bin', ofdmtvrx)
+    env.Alias('install', '/usr/local/bin')
