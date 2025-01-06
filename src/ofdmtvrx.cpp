@@ -17,7 +17,11 @@
 #include "decoder_factory.h"
 #include "audiolevelprinter.h"
 #include "version.h"
+#ifdef PLATFORM_WIN
+#include "xview_win.h"
+#elif
 #include "xview.h"
+#endif
 #include "fdwatch.h"
 #include "sigfd.h"
 #include "platform.h"
@@ -121,6 +125,10 @@ static void Main(int argc, char *const argv[])
 
 	SigFD sfd;
 	w.add(sfd.getFD());
+#elif defined(PLATFORM_WIN)
+	if(version::withX() && !cli.getSuppressX()) {
+		xview.reset(new XView());
+	}
 #endif
 
 	uint32_t offset(0);
