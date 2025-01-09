@@ -33,6 +33,7 @@ private:
 	BITMAPINFOHEADER bmpHeader = {};
 	unsigned m_width{0};
 	unsigned m_height{0};
+	bool m_canResize{false};
 
 	void recreateImage();
 };

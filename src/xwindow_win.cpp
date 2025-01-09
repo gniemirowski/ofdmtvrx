@@ -3,12 +3,11 @@
 #include <cstring>
 #include "xresources_win.h"
 #include "xwindow_win.h"
-#define NOMINMAX 1
 #include <windows.h>
 #include "throw.h"
 
 XWindow::XWindow(XResources &res, const std::string &name, unsigned width, unsigned height, bool canResize)
-    : m_width(width), m_height(height)
+    : m_width(width), m_height(height), m_canResize(canResize)
 {
 	pixels = (BYTE*)malloc(width * height * 3);
 
@@ -35,8 +34,10 @@ XWindow::XWindow(XResources &res, const std::string &name, unsigned width, unsig
 
 	if(RegisterClassEx(&wndclass)) {
 		RECT windowRect = {0, 0, (LONG)width, (LONG)height};
-    	AdjustWindowRectEx(&windowRect, WS_OVERLAPPEDWINDOW, FALSE, 0);
-		hWnd = CreateWindow(name.c_str(), name.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, NULL, NULL, GetModuleHandle(NULL), this);
+		DWORD dwStyle = WS_OVERLAPPEDWINDOW;
+		if (!m_canResize) dwStyle &= ~WS_THICKFRAME & ~WS_MAXIMIZEBOX;
+		AdjustWindowRectEx(&windowRect, dwStyle, FALSE, 0);
+		hWnd = CreateWindow(name.c_str(), name.c_str(), dwStyle, CW_USEDEFAULT, CW_USEDEFAULT,  windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, NULL, NULL, GetModuleHandle(NULL), this);
 		ShowWindow(hWnd, SW_SHOWDEFAULT);
 		UpdateWindow(hWnd);
 		recreateImage();
@@ -86,6 +87,9 @@ LRESULT XWindow::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 				EndPaint(hWnd, &ps);
 			}
             break;
+		case WM_SIZE:
+			if (m_canResize) resize(LOWORD(lParam), HIWORD(lParam));
+			break;
         case WM_DESTROY:
             PostQuitMessage(0);       
             break;
@@ -210,6 +214,8 @@ void XWindow::resize(unsigned width, unsigned height)
 {
 	m_width  = width;
 	m_height = height;
+	bmpHeader.biWidth = width;
+	bmpHeader.biHeight = -height;
 	pixels = (BYTE*)realloc(pixels, width * height * 3);
 	recreateImage();
 }
