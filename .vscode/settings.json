@@ -1,0 +1,11 @@
+{
+    "cmake.additionalKits": [
+        "dsfdf",
+        "fdf"
+    ],
+    "files.associations": {
+        "fstream": "cpp",
+        "xlocmes": "cpp",
+        "istream": "cpp"
+    }
+}

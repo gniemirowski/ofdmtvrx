@@ -1,0 +1,9 @@
+[
+    {
+        "name": "MinGW64",
+        "compilers": {
+            "C": "C:\\Users\\Grzegorz\\Downloads\\mingw\\mingw64\\bin\\gcc.exe",
+            "CXX": "C:\\Users\\Grzegorz\\Downloads\\mingw\\mingw64\\bin\\g++.exe"
+        }
+    }
+]
