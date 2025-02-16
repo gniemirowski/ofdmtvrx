@@ -9,10 +9,10 @@ BEGIN
       VALUE "CompanyName", "CircuitChaos"
       VALUE "LegalCopyright", "CircuitChaos"
       VALUE "FileDescription", "ofdmtvrx"
-      VALUE "FileVersion", "1.0"
+      VALUE "FileVersion", "1.1"
       VALUE "InternalName", "ofdmtvrx"
       VALUE "ProductName", "ofdmtvrx"
-      VALUE "ProductVersion", "1.0"
+      VALUE "ProductVersion", "1.1"
     END
   END
   BLOCK "VarFileInfo"
